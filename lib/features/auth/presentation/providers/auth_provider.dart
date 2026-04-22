@@ -92,25 +92,42 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<bool> _verifyTokenToBackend() async {
-    // Ambil Firebase ID Token (expired tiap 1 jam)
-    final firebaseToken = await _firebaseUser?.getIdToken();
+    try {
+      // Ambil Firebase ID Token (force refresh untuk pastikan fresh)
+      final firebaseToken = await _firebaseUser?.getIdToken(true);
+      if (firebaseToken == null) {
+        _setError('Gagal mendapatkan token Firebase');
+        return false;
+      }
 
-    // POST ke backend — DioClient interceptor sudah handle logging
-    final response = await DioClient.instance.post(
-      ApiConstants.verifyToken,
-      data: {'firebase_token': firebaseToken},
-    );
+      // POST ke backend — DioClient interceptor sudah handle logging
+      final response = await DioClient.instance.post(
+        ApiConstants.verifyToken,
+        data: {'firebase_token': firebaseToken},
+      );
 
-    // Backend return JWT milik sistem kita
-    final data = response.data['data'] as Map<String, dynamic>;
-    final backendToken = data['access_token'] as String;
+      // Backend return JWT milik sistem kita
+      final data = response.data['data'] as Map<String, dynamic>;
+      final backendToken = data['access_token'] as String;
 
-    // Simpan aman di device (encrypted)
-    await SecureStorageService.saveToken(backendToken);
+      // Simpan aman di device (encrypted)
+      await SecureStorageService.saveToken(backendToken);
 
-    _status = AuthStatus.authenticated;
-    notifyListeners();
-    return true;
+      _status = AuthStatus.authenticated;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      final msg = e.toString();
+      if (msg.contains('EMAIL_NOT_VERIFIED')) {
+        _status = AuthStatus.emailNotVerified;
+        notifyListeners();
+      } else if (msg.contains('SocketException') || msg.contains('Connection refused')) {
+        _setError('Tidak dapat terhubung ke server. Periksa jaringan.');
+      } else {
+        _setError('Server error: $msg');
+      }
+      return false;
+    }
   }
 
   // ─── Login dengan Email & Password ───────────────────────
@@ -145,22 +162,42 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> loginWithGoogle() async {
     _setLoading();
     try {
-      final googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        _setError('Login Google dibatalkan');
-        return false;
+      UserCredential userCred;
+
+      if (kIsWeb) {
+        // ── Flutter Web: pakai signInWithPopup ──────────────
+        // google_sign_in package tidak support idToken di web,
+        // sehingga Firebase credential gagal. Gunakan popup langsung.
+        final googleProvider = GoogleAuthProvider()
+          ..addScope('email')
+          ..addScope('profile');
+        userCred = await _auth.signInWithPopup(googleProvider);
+      } else {
+        // ── Mobile: pakai google_sign_in package ────────────
+        final googleUser = await _googleSignIn.signIn();
+        if (googleUser == null) {
+          _setError('Login Google dibatalkan');
+          return false;
+        }
+        final googleAuth = await googleUser.authentication;
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+        userCred = await _auth.signInWithCredential(credential);
       }
 
-      final googleAuth = await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-      final userCred = await _auth.signInWithCredential(credential);
       _firebaseUser = userCred.user;
 
       // Google login → email otomatis terverifikasi
       return await _verifyTokenToBackend();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'popup-closed-by-user') {
+        _setError('Login Google dibatalkan');
+      } else {
+        _setError('Gagal login dengan Google: ${e.message}');
+      }
+      return false;
     } catch (e) {
       _setError('Gagal login dengan Google: $e');
       return false;
