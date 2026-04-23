@@ -13,9 +13,9 @@ class CheckoutPage extends StatefulWidget {
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
-  final _formKey        = GlobalKey<FormState>();
-  final _addressCtrl    = TextEditingController();
-  final _notesCtrl      = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final _addressCtrl = TextEditingController();
+  final _notesCtrl = TextEditingController();
 
   @override
   void dispose() {
@@ -32,7 +32,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
     final success = await checkout.checkout(
       shippingAddress: _addressCtrl.text.trim(),
-      notes:           _notesCtrl.text.trim(),
+      notes: _notesCtrl.text.trim(),
     );
 
     if (!mounted) return;
@@ -48,7 +48,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
           content: Text(checkout.error ?? 'Checkout gagal'),
           backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       );
     }
@@ -72,7 +74,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ),
               child: const Icon(
                 Icons.check_circle_rounded,
-                color: Colors.green,
+                color: AppColors.primary,
                 size: 52,
               ),
             ),
@@ -110,7 +112,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -127,7 +129,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   @override
   Widget build(BuildContext context) {
-    final cart     = context.watch<CartProvider>();
+    final cart = context.watch<CartProvider>();
     final checkout = context.watch<CheckoutProvider>();
 
     return Scaffold(
@@ -153,9 +155,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           const SizedBox(height: 12),
                           ...cart.items.map(
                             (item) => _CheckoutItemTile(
-                              name:     item.product?.name ?? 'Produk #${item.productId}',
+                              name:
+                                  item.product?.name ??
+                                  'Produk #${item.productId}',
                               imageUrl: item.product?.imageUrl ?? '',
-                              price:    item.product?.price ?? 0,
+                              price: item.product?.price ?? 0,
                               quantity: item.quantity,
                               subTotal: item.subTotal,
                             ),
@@ -187,8 +191,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   child: Divider(height: 1),
                                 ),
                                 _PriceRow(
-                                  label:     'Ongkos Kirim',
-                                  value:     0,
+                                  label: 'Ongkos Kirim',
+                                  value: 0,
                                   valueText: 'Gratis',
                                   valueColor: Colors.green,
                                 ),
@@ -197,9 +201,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   child: Divider(height: 1),
                                 ),
                                 _PriceRow(
-                                  label:      'Total Pembayaran',
-                                  value:      cart.totalPrice,
-                                  isBold:     true,
+                                  label: 'Total Pembayaran',
+                                  value: cart.totalPrice,
+                                  isBold: true,
                                   labelColor: AppColors.textPrimary,
                                   valueColor: AppColors.primaryDark,
                                 ),
@@ -210,8 +214,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
                           // ─── Form Pengiriman ──────────────────────────
                           _SectionHeader(
-                            icon:     Icons.local_shipping_outlined,
-                            title:    'Informasi Pengiriman',
+                            icon: Icons.local_shipping_outlined,
+                            title: 'Informasi Pengiriman',
                             subtitle: 'Wajib diisi',
                           ),
                           const SizedBox(height: 12),
@@ -244,10 +248,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   controller: _addressCtrl,
                                   maxLines: 3,
                                   decoration: InputDecoration(
-                                    hintText: 'Masukkan alamat lengkap pengiriman...',
+                                    hintText:
+                                        'Masukkan alamat lengkap pengiriman...',
                                     prefixIcon: const Padding(
                                       padding: EdgeInsets.only(bottom: 40),
-                                      child: Icon(Icons.location_on_outlined, size: 20),
+                                      child: Icon(
+                                        Icons.location_on_outlined,
+                                        size: 20,
+                                      ),
                                     ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
@@ -272,10 +280,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   controller: _notesCtrl,
                                   maxLines: 2,
                                   decoration: InputDecoration(
-                                    hintText: 'Contoh: Tolong jangan diketuk, dll.',
+                                    hintText:
+                                        'Contoh: Tolong jangan diketuk, dll.',
                                     prefixIcon: const Padding(
                                       padding: EdgeInsets.only(bottom: 22),
-                                      child: Icon(Icons.notes_outlined, size: 20),
+                                      child: Icon(
+                                        Icons.notes_outlined,
+                                        size: 20,
+                                      ),
                                     ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
@@ -323,10 +335,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             children: [
               const Text(
                 'Total',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                ),
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
               ),
               Text(
                 'Rp ${_formatPrice(cart.totalPrice)}',
@@ -365,10 +374,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       children: [
                         Icon(Icons.lock_outline, size: 18),
                         SizedBox(width: 8),
-                        Text(
-                          'Bayar Sekarang',
-                          style: TextStyle(fontSize: 16),
-                        ),
+                        Text('Bayar Sekarang', style: TextStyle(fontSize: 16)),
                       ],
                     ),
             ),
@@ -423,7 +429,10 @@ class _SectionHeader extends StatelessWidget {
             ),
             Text(
               subtitle,
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+              ),
             ),
           ],
         ),
@@ -547,11 +556,9 @@ class _PriceRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayText = valueText ??
-        'Rp ${value.toStringAsFixed(0).replaceAllMapped(
-              RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-              (m) => '${m[1]}.',
-            )}';
+    final displayText =
+        valueText ??
+        'Rp ${value.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}';
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
