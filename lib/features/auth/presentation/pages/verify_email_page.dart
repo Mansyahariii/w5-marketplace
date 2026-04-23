@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:market_place/core/constants/app_colors.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/routes/app_router.dart';
@@ -86,7 +85,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                 title: 'Verifikasi Email Kamu',
                 subtitle:
                     'Kami sudah mengirim link verifikasi ke email di bawah ini.',
-                iconColor: AppColors.primary,
+                iconColor: Colors.orange,
               ),
               const SizedBox(height: 24),
 
@@ -142,7 +141,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
               // Tombol logout
               CustomButton(
                 label: 'Ganti Akun / Logout',
-                variant: ButtonVariant.primary,
+                variant: ButtonVariant.text,
                 onPressed: () {
                   context.read<AuthProvider>().logout();
                   Navigator.pushReplacementNamed(context, AppRouter.login);

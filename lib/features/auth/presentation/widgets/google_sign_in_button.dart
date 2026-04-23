@@ -8,45 +8,36 @@ class GoogleSignInButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color borderColor = Color(0xFFCACACA);
-    const Color fillColor = Color(0xFFECECEC);
-
     return SizedBox(
       width: double.infinity,
-      height: 56,
+      height: 52,
       child: OutlinedButton(
         onPressed: isLoading ? null : onPressed,
         style: OutlinedButton.styleFrom(
-          backgroundColor: fillColor,
-          side: const BorderSide(color: borderColor),
+          backgroundColor: Colors.white,
+          side: BorderSide(color: Colors.grey.shade300),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(12),
           ),
-          elevation: 0,
         ),
         child: isLoading
             ? const SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.black54,
-                ),
+                child: CircularProgressIndicator(strokeWidth: 2),
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    'assets/icons/google_logo.png',
-                    height: 24, // Ukuran logo sedikit lebih besar agar jelas
-                  ),
+                  // Logo Google — download dari: fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg
+                  Image.asset('assets/icons/google_logo.png', height: 22),
                   const SizedBox(width: 12),
                   const Text(
-                    'Login with google', // Sesuai teks di gambar referensi
+                    'Lanjutkan dengan Google',
                     style: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black, // Teks hitam pekat
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
                     ),
                   ),
                 ],

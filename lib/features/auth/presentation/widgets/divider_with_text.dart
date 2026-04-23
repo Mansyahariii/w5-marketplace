@@ -6,32 +6,21 @@ class DividerWithText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color lineColor = Color(0xFFCACACA);
-
     return Row(
       children: [
-        const Expanded(
-          child: Divider(
-            color: lineColor,
-            thickness:
-                1, // Ketebalan garis agar terlihat tegas seperti di gambar
-          ),
-        ),
+        const Expanded(child: Divider()),
         Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-          ), // Jarak sedikit lebih lebar
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
             text,
-            style: const TextStyle(
-              color: Colors.black, // Teks warna hitam sesuai permintaan
-              fontSize: 16, // Ukuran sedikit lebih besar agar proporsional
-              fontWeight: FontWeight.w500,
-            ),
+            style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
           ),
         ),
-        const Expanded(child: Divider(color: lineColor, thickness: 1)),
+        const Expanded(child: Divider()),
       ],
     );
   }
 }
+
+// Penggunaan:
+// DividerWithText(text: 'atau')   →   ─────── atau ───────

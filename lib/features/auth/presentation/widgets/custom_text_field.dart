@@ -26,69 +26,45 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color borderColor = Color(0xFFCACACA);
-    const Color textColor = Color(0xFF505050);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
-            color: textColor,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         TextFormField(
           controller: controller,
           obscureText: obscureText,
           validator: validator,
           keyboardType: keyboardType,
           enabled: enabled,
-          style: const TextStyle(color: textColor),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: textColor.withOpacity(0.6)),
             prefixIcon: prefixIcon,
-            prefixIconConstraints: prefixIcon != null
-                ? const BoxConstraints(minWidth: 52, minHeight: 52)
-                : null,
             suffixIcon: suffixIcon,
-            suffixIconConstraints: suffixIcon != null
-                ? const BoxConstraints(minWidth: 52, minHeight: 52)
-                : null,
             filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 18,
-            ),
-
+            fillColor: Colors.grey.shade50,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(color: borderColor),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
-
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(color: borderColor),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
-
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(color: borderColor, width: 1.5),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF1565C0), width: 2),
             ),
-
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Colors.red),
             ),
-
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(color: Colors.red, width: 1.5),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
             ),
           ),
         ),
