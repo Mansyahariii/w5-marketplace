@@ -40,7 +40,11 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
       final success = await auth.checkEmailVerified();
       if (success && mounted) {
         _timer?.cancel();
-        Navigator.pushReplacementNamed(context, AppRouter.dashboard);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRouter.dashboard,
+          (route) => false,
+        );
       }
     });
   }
