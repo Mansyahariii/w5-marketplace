@@ -1,10 +1,9 @@
-﻿import 'package:email_validator/email_validator.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/routes/app_router.dart';
 import '../providers/auth_provider.dart';
-import '../widgets/auth_header.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/loading_overlay.dart';
@@ -44,7 +43,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
     if (!mounted) return;
     if (success) {
-      // Navigasi ke halaman instruksi verifikasi email
       Navigator.pushReplacementNamed(context, AppRouter.verifyEmail);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -64,109 +62,134 @@ class _RegisterPageState extends State<RegisterPage> {
       isLoading: isLoading,
       message: 'Mendaftarkan akun...',
       child: Scaffold(
+        backgroundColor: const Color(0xFFECECEC), // sama dengan login
         body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  const SizedBox(height: 32),
-
-                  // Widget reusable: AuthHeader
-                  const AuthHeader(
-                    icon: Icons.person_add_alt_1,
-                    title: 'Buat Akun Baru',
-                    subtitle: 'Lengkapi data diri Anda untuk mendaftar',
-                  ),
-                  const SizedBox(height: 32),
-
-                  // Widget reusable: CustomTextField
-                  CustomTextField(
-                    label: 'Nama Lengkap',
-                    hint: 'Masukkan nama lengkap',
-                    controller: _nameCtrl,
-                    prefixIcon: const Icon(Icons.person_outline),
-                    validator: (v) =>
-                        (v?.isEmpty ?? true) ? 'Nama wajib diisi' : null,
-                  ),
-                  const SizedBox(height: 16),
-
-                  CustomTextField(
-                    label: 'Email',
-                    hint: 'contoh@email.com',
-                    controller: _emailCtrl,
-                    keyboardType: TextInputType.emailAddress,
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    validator: (v) {
-                      if (v?.isEmpty ?? true) return 'Email wajib diisi';
-                      if (!EmailValidator.validate(v!))
-                        return 'Format email salah';
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  CustomTextField(
-                    label: 'Password',
-                    hint: 'Minimal 8 karakter',
-                    controller: _passCtrl,
-                    obscureText: !_showPass,
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _showPass ? Icons.visibility_off : Icons.visibility,
-                      ),
-                      onPressed: () => setState(() => _showPass = !_showPass),
-                    ),
-                    validator: (v) => (v?.length ?? 0) < 8
-                        ? 'Password minimal 8 karakter'
-                        : null,
-                  ),
-                  const SizedBox(height: 16),
-
-                  CustomTextField(
-                    label: 'Konfirmasi Password',
-                    hint: 'Ulangi password',
-                    controller: _pass2Ctrl,
-                    obscureText: !_showPass,
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    validator: (v) =>
-                        v != _passCtrl.text ? 'Password tidak cocok' : null,
-                  ),
-                  const SizedBox(height: 28),
-
-                  // Widget reusable: CustomButton
-                  CustomButton(
-                    label: 'Daftar Sekarang',
-                    onPressed: _register,
-                    isLoading: isLoading,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Link ke Login
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('Sudah punya akun? '),
-                      GestureDetector(
-                        onTap: () => Navigator.pushReplacementNamed(
-                          context,
-                          AppRouter.login,
-                        ),
-                        child: const Text(
-                          'Masuk',
-                          style: TextStyle(
-                            color: Color(0xFF1565C0),
-                            fontWeight: FontWeight.bold,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // ── Judul ──────────────────────────────────
+                          Text(
+                            'Sign up',
+                            style: Theme.of(context).textTheme.headlineLarge,
                           ),
-                        ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Lengkapi data diri anda untuk mendaftar.',
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                          const SizedBox(height: 32),
+
+                          // ── Field Nama ──────────────────────────────
+                          CustomTextField(
+                            label: 'Nama Lengkap',
+                            hint: 'masukkan nama lengkap',
+                            controller: _nameCtrl,
+                            prefixIcon: const Icon(Icons.person_outline),
+                            validator: (v) => (v?.isEmpty ?? true)
+                                ? 'Nama wajib diisi'
+                                : null,
+                          ),
+                          const SizedBox(height: 16),
+
+                          // ── Field Email ─────────────────────────────
+                          CustomTextField(
+                            label: 'Email',
+                            hint: 'contoh@email.com',
+                            controller: _emailCtrl,
+                            keyboardType: TextInputType.emailAddress,
+                            prefixIcon: const Icon(Icons.email_outlined),
+                            validator: (v) {
+                              if (v?.isEmpty ?? true)
+                                return 'Email wajib diisi';
+                              if (!EmailValidator.validate(v!)) {
+                                return 'Format email salah';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+
+                          // ── Field Password ──────────────────────────
+                          CustomTextField(
+                            label: 'Password',
+                            hint: 'minimal 8 karakter',
+                            controller: _passCtrl,
+                            obscureText: !_showPass,
+                            prefixIcon: const Icon(Icons.lock_outline),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _showPass
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                              ),
+                              onPressed: () =>
+                                  setState(() => _showPass = !_showPass),
+                            ),
+                            validator: (v) => (v?.length ?? 0) < 8
+                                ? 'Password minimal 8 karakter'
+                                : null,
+                          ),
+                          const SizedBox(height: 16),
+
+                          // ── Field Konfirmasi Password ───────────────
+                          CustomTextField(
+                            label: 'Konfirmasi Password',
+                            hint: 'masukkan password',
+                            controller: _pass2Ctrl,
+                            obscureText: !_showPass,
+                            prefixIcon: const Icon(Icons.lock_outline),
+                            validator: (v) => v != _passCtrl.text
+                                ? 'Password tidak cocok'
+                                : null,
+                          ),
+                          const SizedBox(height: 28),
+
+                          // ── Tombol Daftar ───────────────────────────
+                          CustomButton(
+                            label: 'Sign Up',
+                            onPressed: _register,
+                            isLoading: isLoading,
+                          ),
+                          const SizedBox(height: 20),
+
+                          // ── Link ke Login ───────────────────────────
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('Sudah punya akun? '),
+                              GestureDetector(
+                                onTap: () => Navigator.pushReplacementNamed(
+                                  context,
+                                  AppRouter.login,
+                                ),
+                                child: const Text(
+                                  'Log In',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),

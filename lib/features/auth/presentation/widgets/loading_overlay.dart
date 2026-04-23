@@ -18,7 +18,7 @@ class LoadingOverlay extends StatelessWidget {
       children: [
         child,
         if (isLoading)
-          Container(
+          Material(
             color: Colors.black.withOpacity(0.4),
             child: Center(
               child: Container(
@@ -33,7 +33,13 @@ class LoadingOverlay extends StatelessWidget {
                     const CircularProgressIndicator(),
                     if (message != null) ...[
                       const SizedBox(height: 16),
-                      Text(message!, style: const TextStyle(fontSize: 14)),
+                      Text(
+                        message!,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          decoration: TextDecoration.none,
+                        ),
+                      ),
                     ],
                   ],
                 ),

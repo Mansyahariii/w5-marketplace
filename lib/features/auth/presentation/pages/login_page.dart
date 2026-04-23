@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/routes/app_router.dart';
 import '../providers/auth_provider.dart';
-import '../widgets/auth_header.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/divider_with_text.dart';
@@ -109,94 +108,116 @@ class _LoginPageState extends State<LoginPage> {
       isLoading: isLoading,
       message: 'Masuk ke akun...',
       child: Scaffold(
+        backgroundColor: const Color(0xFFECECEC),
         body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  const SizedBox(height: 32),
-                  const AuthHeader(
-                    icon: Icons.lock_open_outlined,
-                    title: 'Selamat Datang',
-                    subtitle: 'Masuk ke akun Anda untuk melanjutkan',
-                  ),
-                  const SizedBox(height: 32),
-                  CustomTextField(
-                    label: 'Email',
-                    hint: 'contoh@email.com',
-                    controller: _emailCtrl,
-                    keyboardType: TextInputType.emailAddress,
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    validator: (v) {
-                      if (v?.isEmpty ?? true) return 'Email wajib diisi';
-                      if (!EmailValidator.validate(v!)) {
-                        return 'Format email salah';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  CustomTextField(
-                    label: 'Password',
-                    hint: 'Masukkan password',
-                    controller: _passCtrl,
-                    obscureText: !_showPass,
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _showPass ? Icons.visibility_off : Icons.visibility,
-                      ),
-                      onPressed: () => setState(() => _showPass = !_showPass),
-                    ),
-                    validator: (v) =>
-                        (v?.isEmpty ?? true) ? 'Password wajib diisi' : null,
-                  ),
-                  const SizedBox(height: 8),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () => _showForgotPasswordDialog(context),
-                      child: const Text('Lupa Password?'),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  CustomButton(
-                    label: 'Masuk',
-                    onPressed: _loginEmail,
-                    isLoading: isLoading,
-                  ),
-                  const SizedBox(height: 20),
-                  const DividerWithText(text: 'atau masuk dengan'),
-                  const SizedBox(height: 20),
-                  GoogleSignInButton(
-                    onPressed: _loginGoogle,
-                    isLoading: isLoading,
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('Belum punya akun? '),
-                      GestureDetector(
-                        onTap: () => Navigator.pushReplacementNamed(
-                          context,
-                          AppRouter.register,
-                        ),
-                        child: const Text(
-                          'Daftar',
-                          style: TextStyle(
-                            color: Color(0xFF1565C0),
-                            fontWeight: FontWeight.bold,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Log in',
+                            style: Theme.of(context).textTheme.headlineLarge,
                           ),
-                        ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Masuk ke akun anda untuk melanjutkan.',
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                          const SizedBox(height: 32),
+                          CustomTextField(
+                            label: 'Email',
+                            hint: 'contoh@email.com',
+                            controller: _emailCtrl,
+                            keyboardType: TextInputType.emailAddress,
+                            prefixIcon: const Icon(Icons.email_outlined),
+                            validator: (v) {
+                              if (v?.isEmpty ?? true)
+                                return 'Email wajib diisi';
+                              if (!EmailValidator.validate(v!)) {
+                                return 'Format email salah';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          CustomTextField(
+                            label: 'Password',
+                            hint: 'masukkan password',
+                            controller: _passCtrl,
+                            obscureText: !_showPass,
+                            prefixIcon: const Icon(Icons.lock_outline),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _showPass
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                              ),
+                              onPressed: () =>
+                                  setState(() => _showPass = !_showPass),
+                            ),
+                            validator: (v) => (v?.isEmpty ?? true)
+                                ? 'Password wajib diisi'
+                                : null,
+                          ),
+                          const SizedBox(height: 8),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () =>
+                                  _showForgotPasswordDialog(context),
+                              child: const Text('Lupa Password?'),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          CustomButton(
+                            label: 'Login',
+                            onPressed: _loginEmail,
+                            isLoading: isLoading,
+                          ),
+                          const SizedBox(height: 20),
+                          const DividerWithText(text: 'atau'),
+                          const SizedBox(height: 20),
+                          GoogleSignInButton(
+                            onPressed: _loginGoogle,
+                            isLoading: isLoading,
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('Belum punya akun? '),
+                              GestureDetector(
+                                onTap: () => Navigator.pushReplacementNamed(
+                                  context,
+                                  AppRouter.register,
+                                ),
+                                child: const Text(
+                                  'Sign Up',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),
