@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/constants/app_colors.dart';
 
 enum ButtonVariant { primary, outlined, text }
 
@@ -20,6 +21,8 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Warna tombol diambil dari AppColors agar konsisten dengan dashboard
+
     final child = isLoading
         ? const SizedBox(
             width: 20,
@@ -45,39 +48,42 @@ class CustomButton extends StatelessWidget {
 
     return SizedBox(
       width: double.infinity,
-      height: 52,
+      height: 54,
       child: switch (variant) {
         ButtonVariant.primary => ElevatedButton(
           onPressed: isLoading ? null : onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF1565C0),
+            backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
+            elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(18),
             ),
-            elevation: 2,
           ),
           child: child,
         ),
         ButtonVariant.outlined => OutlinedButton(
           onPressed: isLoading ? null : onPressed,
           style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: Color(0xFF1565C0), width: 1.5),
+            side: const BorderSide(color: AppColors.primary, width: 2),
+            foregroundColor: AppColors.primary,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(18),
             ),
           ),
           child: child,
         ),
         ButtonVariant.text => TextButton(
           onPressed: isLoading ? null : onPressed,
+          style: TextButton.styleFrom(
+            foregroundColor: AppColors.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+          ),
           child: child,
         ),
       },
     );
   }
 }
-
-// Contoh penggunaan:
-// CustomButton(label: 'Daftar', onPressed: _register, isLoading: isLoading)
-// CustomButton(label: 'Batal', variant: ButtonVariant.outlined, onPressed: () {})
