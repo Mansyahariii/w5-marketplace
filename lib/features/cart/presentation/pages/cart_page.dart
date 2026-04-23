@@ -32,7 +32,9 @@ class _CartPageState extends State<CartPage> {
         actions: [
           if (cart.items.isNotEmpty)
             TextButton.icon(
-              onPressed: cart.isMutating ? null : () => _confirmClearCart(context, cart),
+              onPressed: cart.isMutating
+                  ? null
+                  : () => _confirmClearCart(context, cart),
               icon: const Icon(Icons.delete_sweep, color: Colors.white),
               label: const Text(
                 'Hapus Semua',
@@ -133,9 +135,9 @@ class _CartPageState extends State<CartPage> {
           Text(
             'Keranjang Masih Kosong',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -146,10 +148,7 @@ class _CartPageState extends State<CartPage> {
           ElevatedButton.icon(
             icon: const Icon(Icons.storefront),
             label: const Text('Lihat Katalog'),
-            onPressed: () => Navigator.pushReplacementNamed(
-              context,
-              AppRouter.dashboard,
-            ),
+            onPressed: () => Navigator.pop(context),
           ),
         ],
       ),
@@ -270,7 +269,7 @@ class _CartItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cart    = context.read<CartProvider>();
+    final cart = context.read<CartProvider>();
     final product = item.product;
 
     return Container(
@@ -333,10 +332,7 @@ class _CartItemCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     'Subtotal: Rp ${_formatPrice(item.subTotal)}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade500,
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                   ),
                 ],
               ),
@@ -347,7 +343,11 @@ class _CartItemCard extends StatelessWidget {
               children: [
                 // Tombol hapus item
                 IconButton(
-                  icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.red,
+                    size: 20,
+                  ),
                   onPressed: isMutating
                       ? null
                       : () => cart.deleteItem(item.productId),
