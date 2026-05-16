@@ -37,13 +37,33 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
     _timer = Timer.periodic(const Duration(seconds: 5), (_) async {
       if (!mounted) return;
       final auth = context.read<AuthProvider>();
+      
+      // Jangan poll jika sedang loading (request sebelumnya belum selesai)
+      if (auth.isLoading) return;
+      
       final success = await auth.checkEmailVerified();
-      if (success && mounted) {
+      if (!mounted) return;
+      
+      if (success) {
         _timer?.cancel();
         Navigator.pushNamedAndRemoveUntil(
           context,
           AppRouter.dashboard,
           (route) => false,
+        );
+      } else if (auth.status == AuthStatus.error) {
+        // Berhenti polling jika ada error dari backend
+        _timer?.cancel();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(auth.errorMessage ?? 'Terjadi kesalahan'),
+            backgroundColor: Colors.red,
+            action: SnackBarAction(
+              label: 'Coba Lagi',
+              textColor: Colors.white,
+              onPressed: _startPolling,
+            ),
+          ),
         );
       }
     });

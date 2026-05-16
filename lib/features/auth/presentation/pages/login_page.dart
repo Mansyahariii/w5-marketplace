@@ -140,8 +140,9 @@ class _LoginPageState extends State<LoginPage> {
                             keyboardType: TextInputType.emailAddress,
                             prefixIcon: const Icon(Icons.email_outlined),
                             validator: (v) {
-                              if (v?.isEmpty ?? true)
+                              if (v?.isEmpty ?? true) {
                                 return 'Email wajib diisi';
+                              }
                               if (!EmailValidator.validate(v!)) {
                                 return 'Format email salah';
                               }
