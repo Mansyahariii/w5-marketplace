@@ -1,6 +1,6 @@
 // Representasi kondisi autentikasi
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart';
 
@@ -100,7 +100,11 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
 
-      // POST ke backend — DioClient interceptor sudah handle logging
+      debugPrint('[AUTH] Mengirim firebase token ke backend...');
+      debugPrint('[AUTH] Email verified: ${_firebaseUser?.emailVerified}');
+
+      // POST ke backend — endpoint ini public, tidak perlu Authorization header
+      // DioClient interceptor sudah skip inject token untuk endpoint ini
       final response = await DioClient.instance.post(
         ApiConstants.verifyToken,
         data: {'firebase_token': firebaseToken},
@@ -113,15 +117,24 @@ class AuthProvider extends ChangeNotifier {
       // Simpan aman di device (encrypted)
       await SecureStorageService.saveToken(backendToken);
 
+      _backendToken = backendToken;
       _status = AuthStatus.authenticated;
       notifyListeners();
       return true;
     } catch (e) {
+      debugPrint('[AUTH] _verifyTokenToBackend error: $e');
+      // Log response body untuk debug
+      if (e is DioException && e.response != null) {
+        debugPrint('[AUTH] Response status: ${e.response?.statusCode}');
+        debugPrint('[AUTH] Response body: ${e.response?.data}');
+        debugPrint('[AUTH] Request headers: ${e.requestOptions.headers}');
+      }
       final msg = e.toString();
       if (msg.contains('EMAIL_NOT_VERIFIED')) {
         _status = AuthStatus.emailNotVerified;
         notifyListeners();
-      } else if (msg.contains('SocketException') || msg.contains('Connection refused')) {
+      } else if (msg.contains('SocketException') ||
+          msg.contains('Connection refused')) {
         _setError('Tidak dapat terhubung ke server. Periksa jaringan.');
       } else {
         _setError('Server error: $msg');
@@ -211,10 +224,33 @@ class AuthProvider extends ChangeNotifier {
 
   // ─── Cek status verifikasi email (polling) ────────────────
   Future<bool> checkEmailVerified() async {
-    await _firebaseUser?.reload(); // Refresh data user dari Firebase
-    _firebaseUser = _auth.currentUser;
+    try {
+      await _firebaseUser?.reload(); // Refresh data user dari Firebase
+      _firebaseUser = _auth.currentUser;
+    } catch (e) {
+      // Network error saat reload — skip polling cycle ini, coba lagi nanti
+      debugPrint('[AUTH] Reload user gagal (network): $e');
+      return false;
+    }
 
     if (_firebaseUser?.emailVerified ?? false) {
+      // Email sudah diverifikasi → re-login untuk dapat fresh token
+      // yang sudah include emailVerified=true
+      if (_tempEmail != null && _tempPassword != null) {
+        try {
+          final credential = await _auth.signInWithEmailAndPassword(
+            email: _tempEmail!,
+            password: _tempPassword!,
+          );
+          _firebaseUser = credential.user;
+          _tempEmail = null;
+          _tempPassword = null;
+        } catch (e) {
+          debugPrint('[AUTH] Re-login gagal: $e');
+          _setError('Gagal re-login setelah verifikasi email');
+          return false;
+        }
+      }
       return await _verifyTokenToBackend();
     }
     return false;
