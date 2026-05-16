@@ -1,5 +1,7 @@
 class ApiConstants {
-  static const String baseUrl = 'http://192.168.100.97:8080/v1';
+  // Gunakan 10.0.2.2 untuk Android Emulator (alias localhost komputer host)
+  // Ganti ke IP jaringan (misal 192.168.x.x) jika pakai perangkat fisik
+  static const String baseUrl = 'http://10.0.2.2:8080/v1';
 
   // Auth endpoints
   static const String verifyToken = '/auth/verify-token';
@@ -14,7 +16,7 @@ class ApiConstants {
   static const String orders = '/orders';
   static const String checkout = '/orders/checkout';
 
-  // Timeout
-  static const int connectTimeout = 15000;
-  static const int receiveTimeout = 15000;
+  // Timeout (dinaikkan agar tidak timeout saat emulator lambat)
+  static const int connectTimeout = 30000;
+  static const int receiveTimeout = 30000;
 }

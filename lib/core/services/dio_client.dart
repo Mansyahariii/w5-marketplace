@@ -34,7 +34,12 @@ class DioClient {
         onError: (error, handler) async {
           debugPrint('[ERROR] ${error.response?.statusCode}');
           if (error.response?.statusCode == 401) {
-            await SecureStorageService.clearAll(); // Auto logout
+            // Jangan auto-logout untuk endpoint verify-token
+            // karena endpoint ini memang bisa gagal saat proses verifikasi
+            final path = error.requestOptions.path;
+            if (!path.contains('verify-token')) {
+              await SecureStorageService.clearAll(); // Auto logout
+            }
           }
           handler.next(error);
         },
@@ -45,9 +50,13 @@ class DioClient {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final token = await SecureStorageService.getToken();
-          if (token != null) {
-            options.headers['Authorization'] = 'Bearer $token';
+          // Skip auth header untuk endpoint public seperti verify-token
+          final path = options.path;
+          if (!path.contains('verify-token')) {
+            final token = await SecureStorageService.getToken();
+            if (token != null) {
+              options.headers['Authorization'] = 'Bearer $token';
+            }
           }
           handler.next(options);
         },
